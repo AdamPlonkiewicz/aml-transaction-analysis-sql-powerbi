@@ -1,0 +1,94 @@
+DEFINE
+    MEASURE '_Measures'[Laundering Amount] = CALCULATE ( [Total Amount], Transactions[is_laundering] = 1 )
+    MEASURE '_Measures'[Laundering Amount Share] = DIVIDE ( [Laundering Amount], [Total Amount] )
+    MEASURE '_Measures'[Laundering Rate] = DIVIDE ( [Laundering Transactions], [Total Transactions] )
+    MEASURE '_Measures'[Laundering Transactions] = SUM ( Transactions[is_laundering] )
+    MEASURE '_Measures'[Total Amount] = SUM ( Transactions[amount] )
+    MEASURE '_Measures'[Total Transactions] = COUNTROWS ( Transactions )
+    MEASURE '_Measures'[Overall Laundering Rate] = CALCULATE ( [Laundering Rate], ALL ( Transactions ) )
+    MEASURE '_Measures'[Number of Typologies] = DISTINCTCOUNT(Transactions[laundering_type])
+    MEASURE '_Measures'[Median Amount] = MEDIAN(Transactions[amount])
+    MEASURE '_Measures'[Amount Share of Laundering] = DIVIDE (
+    [Laundering Amount],
+    CALCULATE ( [Laundering Amount], ALL ( Transactions[laundering_type] ) )
+)
+    MEASURE '_Measures'[Min Amount] = MIN(Transactions[amount])
+    MEASURE '_Measures'[Max Amount] = MAX(Transactions[amount])
+    MEASURE '_Measures'[Selected Typology] = SELECTEDVALUE ( Transactions[laundering_type], "All typologies" )
+    MEASURE '_Measures'[Payment Type Share] = DIVIDE (
+    [Laundering Transactions],
+    CALCULATE ( [Laundering Transactions], ALL ( Transactions[payment_type] ) )
+)
+    MEASURE '_Measures'[Sample Tx Count] = COUNTROWS('Sample Accounts')
+    MEASURE '_Measures'[Flagged Structuring] = SUM (Transactions[flag_structuring] )
+    MEASURE '_Measures'[TP Structuring] = CALCULATE( [Flagged Structuring], Transactions[laundering_type] = "Smurfing")
+    MEASURE '_Measures'[Target Structuring] = CALCULATE ( COUNTROWS ( Transactions ), Transactions[laundering_type] = "Smurfing" )
+    MEASURE '_Measures'[Precision Structuring] = DIVIDE ( [TP Structuring], [Flagged Structuring] )
+    MEASURE '_Measures'[Recall Structuring] = DIVIDE ( [TP Structuring], [Target Structuring] )
+    MEASURE '_Measures'[False Alarms Structuring] = [Flagged Structuring] - [TP Structuring]
+    MEASURE '_Measures'[Tx Share of Laundering] = DIVIDE ( [Laundering Transactions],
+       CALCULATE ( [Laundering Transactions], ALL ( Transactions[laundering_type] ) ) )
+    MEASURE '_Measures'[Detected Tx Share] = DIVIDE ( [TP Structuring] + [TP Smurfing] + [TP Cash Withdrawal], [Laundering Transactions] )
+    MEASURE '_Measures'[Detected Amount Share] = DIVIDE (
+       CALCULATE ( [Total Amount], Transactions[flag_structuring] = 1, Transactions[laundering_type] = "Smurfing" )
+     + CALCULATE ( [Total Amount], Transactions[flag_smurfing] = 1, Transactions[laundering_type] = "Structuring" )
+     + CALCULATE ( [Total Amount], Transactions[flag_cash_withdrawal] = 1, Transactions[laundering_type] = "Cash Withdrawal" ),
+       [Laundering Amount] )
+    MEASURE '_Measures'[Flagged Smurfing] = SUM ( Transactions[flag_smurfing])
+    MEASURE '_Measures'[Flagged Cash Withdrawal] = SUM ( Transactions[flag_cash_withdrawal])
+    MEASURE '_Measures'[TP Smurfing] = CALCULATE( [Flagged Smurfing], Transactions[laundering_type] = "Structuring")
+    MEASURE '_Measures'[TP Cash Withdrawal] = CALCULATE( [Flagged Cash Withdrawal], Transactions[laundering_type] = "Cash Withdrawal")
+    MEASURE '_Measures'[Missed Structuring] = [Target Structuring] - [TP Structuring]
+    MEASURE '_Measures'[Missed Smurfing] = [Target Smurfing] - [TP Smurfing]
+    MEASURE '_Measures'[Target Smurfing] = CALCULATE ( COUNTROWS ( Transactions ), Transactions[laundering_type] = "Structuring" )
+    MEASURE '_Measures'[Target Cash Withdrawal] = CALCULATE ( COUNTROWS ( Transactions ), Transactions[laundering_type] = "Cash Withdrawal" )
+    MEASURE '_Measures'[Missed Cash Withdrawal] = [Target Cash Withdrawal] - [TP Cash Withdrawal]
+    MEASURE '_Measures'[False Alarms Smurfing] = [Flagged Smurfing] - [TP Smurfing]
+    MEASURE '_Measures'[False Alarms Cash Withdrawal] = [Flagged Cash Withdrawal] - [TP Cash Withdrawal]
+    MEASURE '_Measures'[Precision Smurfing] = DIVIDE ( [TP Smurfing], [Flagged Smurfing] )
+    MEASURE '_Measures'[Precision Cash withdrawal] = DIVIDE ( [TP Cash Withdrawal], [Flagged Cash Withdrawal] )
+    MEASURE '_Measures'[Recall Smurfing] = DIVIDE ( [TP Smurfing], [Target Smurfing] )
+    MEASURE '_Measures'[Recall Cash Withdrawal] = DIVIDE ( [TP Cash Withdrawal], [Target Cash Withdrawal] )
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "Laundering Amount", [Laundering Amount],
+        "Laundering Amount Share", [Laundering Amount Share],
+        "Laundering Rate", [Laundering Rate],
+        "Laundering Transactions", [Laundering Transactions],
+        "Total Amount", [Total Amount],
+        "Total Transactions", [Total Transactions],
+        "Overall Laundering Rate", [Overall Laundering Rate],
+        "Number of Typologies", [Number of Typologies],
+        "Median Amount", [Median Amount],
+        "Amount Share of Laundering", [Amount Share of Laundering],
+        "Min Amount", [Min Amount],
+        "Max Amount", [Max Amount],
+        "Selected Typology", [Selected Typology],
+        "Payment Type Share", [Payment Type Share],
+        "Sample Tx Count", [Sample Tx Count],
+        "Flagged Structuring", [Flagged Structuring],
+        "TP Structuring", [TP Structuring],
+        "Target Structuring", [Target Structuring],
+        "Precision Structuring", [Precision Structuring],
+        "Recall Structuring", [Recall Structuring],
+        "False Alarms Structuring", [False Alarms Structuring],
+        "Tx Share of Laundering", [Tx Share of Laundering],
+        "Detected Tx Share", [Detected Tx Share],
+        "Detected Amount Share", [Detected Amount Share],
+        "Flagged Smurfing", [Flagged Smurfing],
+        "Flagged Cash Withdrawal", [Flagged Cash Withdrawal],
+        "TP Smurfing", [TP Smurfing],
+        "TP Cash Withdrawal", [TP Cash Withdrawal],
+        "Missed Structuring", [Missed Structuring],
+        "Missed Smurfing", [Missed Smurfing],
+        "Target Smurfing", [Target Smurfing],
+        "Target Cash Withdrawal", [Target Cash Withdrawal],
+        "Missed Cash Withdrawal", [Missed Cash Withdrawal],
+        "False Alarms Smurfing", [False Alarms Smurfing],
+        "False Alarms Cash Withdrawal", [False Alarms Cash Withdrawal],
+        "Precision Smurfing", [Precision Smurfing],
+        "Precision Cash withdrawal", [Precision Cash withdrawal],
+        "Recall Smurfing", [Recall Smurfing],
+        "Recall Cash Withdrawal", [Recall Cash Withdrawal]
+    )
