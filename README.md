@@ -100,19 +100,23 @@ The Power BI report has a cover page and four pages. The full report is availabl
 
 ### Interaction
 
-<!-- Drag each MP4 file into the GitHub README editor and replace the lines below with the generated links. -->
+**Walkthrough – part 1**
 
-**Filtering by typology**
+https://github.com/user-attachments/assets/637ad6ae-fb8d-4337-91b4-96ac03233cf8
 
-VIDEO_LINK_1
+**Walkthrough – part 2**
 
-**Exploring account timelines**
+https://github.com/user-attachments/assets/6c8625da-8a26-4e26-bf42-0faab2af0c7d
 
-VIDEO_LINK_2
+Data preparation in Power Query:
 
-Data preparation in Power Query – typology names formatted for display:
+**Transactions** – typology names formatted for display (underscores replaced, long names shortened)
 
-![Power Query steps](images/power_query_steps.png)
+![Power Query – Transactions](images/power_query_transactions_steps.png)
+
+**Sample Accounts** – columns renamed for the report
+
+![Power Query – Sample Accounts](images/power_query_sample_accounts_steps.png)
 
 ## Skills demonstrated
 
